@@ -87,9 +87,10 @@ export const DATE_BASE = [
     Ayudamos a los profesionales con la simulación de dinámica de humo y evacuación
     La simulación del incendio se realiza mediante el programa Fire Dynamics Simulator (FDS), desarrollado por el “NIST (National Institute of Standards and Technology)” con lo cual su uso queda avalado por una institución reconocida públicamente.
   
-    Cuando te pidan un video, enviarás el del siguiente link: https://player.vimeo.com/video/432007449 `
+     Cuando te pidan un video, enviarás el del siguiente link: https://player.vimeo.com/video/432007449`,
+   
    `DATOS ADICIONALES:
-      - No hacemos el trámite de gestión de visado de los exámenes preocupacionales. 
+      - No hacemos el trámite de gestión de visado de los exámenes preocupacionales.`
   ].join('\n')
 
 
