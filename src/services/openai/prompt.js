@@ -88,6 +88,8 @@ export const DATE_BASE = [
     La simulación del incendio se realiza mediante el programa Fire Dynamics Simulator (FDS), desarrollado por el “NIST (National Institute of Standards and Technology)” con lo cual su uso queda avalado por una institución reconocida públicamente.
   
     Cuando te pidan un video, enviarás el del siguiente link: https://player.vimeo.com/video/432007449 `
+   `DATOS ADICIONALES:
+      - No hacemos el trámite de gestión de visado de los exámenes preocupacionales. 
   ].join('\n')
 
 
@@ -99,11 +101,11 @@ Evaluar la conversación siguiente para identificar:
 
    - Contexto de la conversación anterior.
    - Mención de un servicio específico.
-   - Intención explícita de pedir un presupuesto, honorarios, costos, precios, etc.
+   - Intención explícita de pedir un presupuesto, honorarios, costos, precios, valor etc.
 
 CATEGORÍAS DE SERVICIOS:
 
-- SISTEMA: Presupuesto Sistema de autoprotección. [Ley 5920 – CABA. Disposición 356/DGDCIV/23. Ley 5.641]
+- SISTEMA: Presupuesto Sistema de autoprotección. [Ley 5920 – CABA. Disposición 356/DGDCIV/23. Ley 5.641 - Planos de evacuación]
 - EXTINTORES: Entrenamiento uso de extintores y simulador de fuego. [Resolución SRT N°905/15 – Inciso 15.2.2]
 - SERVICIO: Servicio higiene y seguridad. [Ley Nacional 19.587 – Planes Anuales de Prevención]
 - ERGONOMICOS: Estudios ergonómicos. [Resolución MTSS N°295/03. Resolución SRT 886/15]
