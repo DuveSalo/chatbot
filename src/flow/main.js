@@ -11,7 +11,6 @@ import servicio from "../flow/presupuesto/servicio.js";
 
 export const mainFlow = addKeyword(EVENTS.WELCOME)
 .addAnswer('Bienvenido al asistente virtual de la *Consultora Integral Excon*')
-.addAnswer('¿Como puedo ayudarte el día de hoy 😀?')
 .addAction(async (ctx, ctxFn) => {
     const dbClient = await mongoAdapter.buscarClientePorNumero(ctx.from);
 
