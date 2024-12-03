@@ -10,7 +10,6 @@ import mediciones from "../flow/presupuesto/mediciones.js";
 import servicio from "../flow/presupuesto/servicio.js";
 
 export const mainFlow = addKeyword(EVENTS.WELCOME)
-.addAnswer('Bienvenido al asistente virtual de la *Consultora Integral Excon*')
 .addAction(async (ctx, ctxFn) => {
     const dbClient = await mongoAdapter.buscarClientePorNumero(ctx.from);
 
