@@ -36,8 +36,4 @@ RUN npm cache clean --force && pnpm install --production --ignore-scripts \
     && addgroup -g 1001 -S nodejs && adduser -S -u 1001 nodejs \
     && rm -rf $PNPM_HOME/.npm $PNPM_HOME/.node-gyp
 
-<<<<<<< HEAD
-CMD ["pnpm", "start"]
-=======
-CMD ["pnpm", "start"]
->>>>>>> 3e486d3cc9792e1f3c668115ef79c539dbc7d832
+    CMD ["pnpm", "start"]
