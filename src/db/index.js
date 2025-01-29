@@ -13,6 +13,7 @@ const ClienteSchema = new mongoose.Schema({
   nombre: { type: String, required: true },
   numero: { type: String, required: true, unique: true },
   historial: [HistorySchema], // Relación con el historial
+  ultimaInteraccion: { type: Date },
 });
 
 // Modelo de Mongoose para Cliente
@@ -42,10 +43,12 @@ export class MongoAdapter {
       if (clienteExistente) {
         // Actualizar solo historial
         clienteExistente.historial = clienteData.historial;
+        clienteExistente.ultimaInteraccion = new Date();
         await clienteExistente.save();
         return clienteExistente;
       } else {
         const nuevoCliente = new Cliente(clienteData);
+        nuevoCliente.ultimaInteraccion = new Date();
         await nuevoCliente.save();
         return nuevoCliente;
       }
@@ -72,6 +75,7 @@ export class MongoAdapter {
 
       // Agregar la nueva entrada al historial
       cliente.historial.push(historialData);
+      cliente.ultimaInteraccion = new Date();
       await cliente.save();
       return cliente;
     } catch (error) {
