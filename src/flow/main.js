@@ -3,89 +3,129 @@ import { mongoAdapter } from '../db/index.js';
 import { chatHistory, runDetermine } from '../services/openai/index.js';
 import { generatePrompt } from '../services/openai/prompt.js';
 import { createMessageQueue } from '../utils/fast-entires.js';
-import { flowPreguntasIniciales } from '../flow/presupuesto/sistema/inicio.js';
-import asistencia from "../flow/presupuesto/asistencia.js";
-import extintores from "../flow/presupuesto/extintores.js";
-import ergonomicos from "../flow/presupuesto/ergonomicos.js";
-import mediciones from "../flow/presupuesto/mediciones.js";
-import servicio from "../flow/presupuesto/servicio.js";
+import { flowPreguntasIniciales } from './presupuesto/sistema/inicio.js';
+import asistencia from "./presupuesto/asistencia.js";
+import extintores from "./presupuesto/extintores.js";
+import ergonomicos from "./presupuesto/ergonomicos.js";
+import mediciones from "./presupuesto/mediciones.js";
+import servicio from "./presupuesto/servicio.js";
 import { isSameDay } from 'date-fns';
 
 const queueConfig = { gapMilliseconds: 5000 };
 const enqueueMessage = createMessageQueue(queueConfig);
 
-const handleDbError = (ctx) => {
-    console.error("Error: Cliente no encontrado en la base de datos para:", ctx.from);
-    // Considerar enviar un mensaje al usuario informando del error.
-    return null; // Importante retornar null para que el flujo se detenga.
+/**
+ * Si el cliente no existe en la base de datos,
+ * lo creamos en lugar de cortar el flujo.
+ */
+const handleDbError = async (ctx, state) => {
+  console.warn("Cliente no encontrado, se creará uno nuevo para:", ctx.from);
+
+  // Creamos un nuevo cliente “mínimo”.
+  const newClientData = {
+    nombre: ctx.pushName || 'UsuarioDesconocido',
+    numero: ctx.from,
+    historial: [],
+    ultimaInteraccion: new Date()
+  };
+
+  // Guardamos al nuevo cliente en la base de datos
+  const savedClient = await mongoAdapter.agregarOActualizarCliente(newClientData);
+
+  // Lo guardamos en el estado para que el flujo continúe
+  await state.update({
+    dbClient: savedClient,
+    limitedHistory: []
+  });
+
+  return savedClient;
 };
 
 export const mainFlow = addKeyword(EVENTS.WELCOME)
-    .addAction(async (ctx, { state }) => {
-        const dbClient = await mongoAdapter.buscarClientePorNumero(ctx.from);
-        if (!dbClient) return handleDbError(ctx);
+  .addAction(async (ctx, { state }) => {
+    // Buscamos al cliente
+    let dbClient = await mongoAdapter.buscarClientePorNumero(ctx.from);
 
-        const limitedHistory = dbClient.historial?.slice(-2).reduce((acc, item) => {
-            acc.push({ role: "user", content: item.pregunta });
-            acc.push({ role: "assistant", content: item.respuesta });
-            return acc;
-        }, []) || [];
+    // Si no existe, lo creamos en la DB en lugar de cortar la comunicación
+    if (!dbClient) {
+      dbClient = await handleDbError(ctx, state);
+    }
 
-        await state.update({ dbClient, limitedHistory }); // Guardar dbClient en el estado
-    })
-    .addAction(async (ctx, { state, gotoFlow, flowDynamic }) => {
-        try {
-            enqueueMessage(ctx, async (body) => {
-                const dbClient = await state.get('dbClient');
-                if (!dbClient) return handleDbError(ctx);
+    // Tomamos los últimos 2 intercambios para usar como "historial limitado"
+    const limitedHistory = dbClient.historial?.slice(-2).reduce((acc, item) => {
+      acc.push({ role: "user", content: item.pregunta });
+      acc.push({ role: "assistant", content: item.respuesta });
+      return acc;
+    }, []) || [];
 
-                const history = dbClient.historial || [];
-                const isFirstMessage = !history.length || !isSameDay(new Date(history[history.length - 1].fecha), new Date());
-
-                if (isFirstMessage) {
-                    const saludo = ctx.from.sexo === 'F' ? 'Bienvenida' : 'Bienvenido';
-                    await flowDynamic([{ body: `¡Hola, ${ctx.pushName}! ${saludo} al asistente virtual de la Consultora Integral Excon 😃` }]);
-                }
-
-                const combinedMessage = { role: "user", content: body };
-                const limitedHistory = await state.get('limitedHistory');
-                const messagesForDetermination = [...limitedHistory, combinedMessage];
-
-                const serviceResponse = await runDetermine(messagesForDetermination);
-                const service = serviceResponse?.trim().toUpperCase();
-
-                const flowMap = {
-                    'SISTEMA': flowPreguntasIniciales,
-                    'EXTINTORES': extintores,
-                    'SERVICIO': servicio,
-                    'ERGONOMICOS': ergonomicos,
-                    'MEDICIONES': mediciones,
-                    'ASISTENCIA': asistencia,
-                };
-
-                if (flowMap[service]) {
-                    return gotoFlow(flowMap[service]);
-                } else if (service === 'CONSULTA') {
-                    const response = await chatHistory(generatePrompt(ctx.pushName || 'Usuario'), messagesForDetermination);
-                    const cleanedResponse = response.trim();
-                    const chunks = cleanedResponse.split(/(?<!\d)\.\s+/g); // Revisar si es necesaria esta división
-
-                    for (const chunk of chunks) {
-                        if (chunk.trim()) {
-                            await flowDynamic([{ body: chunk.trim() + '.' }]);
-                        }
-                    }
-
-                    const newEntry = {
-                        pregunta: body,
-                        respuesta: cleanedResponse,
-                        fecha: new Date(),
-                    };
-                    await mongoAdapter.agregarHistorial(ctx.from, newEntry);
-                }
-            });
-        } catch (error) {
-            console.error('Error en el flujo principal:', error);
-            // Manejo de errores más robusto aquí
+    // Guardamos en el estado
+    await state.update({ dbClient, limitedHistory });
+  })
+  .addAction(async (ctx, { state, gotoFlow, flowDynamic }) => {
+    try {
+      enqueueMessage(ctx, async (body) => {
+        // Obtenemos el cliente
+        let dbClient = await state.get('dbClient');
+        if (!dbClient) {
+          // Si no hay cliente en el estado, lo creamos
+          dbClient = await handleDbError(ctx, state);
         }
-    });
+
+        const history = dbClient.historial || [];
+        const isFirstMessage = !history.length ||
+          !isSameDay(new Date(history[history.length - 1].fecha), new Date());
+
+        // Respondemos un saludo inicial sólo si es el primer mensaje del día
+        if (isFirstMessage) {
+          const saludo = ctx.from.sexo === 'F' ? 'Bienvenida' : 'Bienvenido';
+          await flowDynamic([{ body: `¡Hola, ${ctx.pushName}! ${saludo} al asistente virtual de la Consultora Integral Excon 😃` }]);
+        }
+
+        // Construimos el mensaje para determinar el flujo (runDetermine)
+        const combinedMessage = { role: "user", content: body };
+        const limitedHistory = await state.get('limitedHistory');
+        const messagesForDetermination = [...limitedHistory, combinedMessage];
+
+        // Determinamos la intención
+        const serviceResponse = await runDetermine(messagesForDetermination);
+        const service = serviceResponse?.trim().toUpperCase();
+
+        // Redireccionamos al flujo si matchea alguna categoría
+        const flowMap = {
+          'SISTEMA': flowPreguntasIniciales,
+          'EXTINTORES': extintores,
+          'SERVICIO': servicio,
+          'ERGONOMICOS': ergonomicos,
+          'MEDICIONES': mediciones,
+          'ASISTENCIA': asistencia,
+        };
+
+        if (flowMap[service]) {
+          return gotoFlow(flowMap[service]);
+        } else if (service === 'CONSULTA') {
+          // Llamada a chatHistory
+          const response = await chatHistory(generatePrompt(ctx.pushName || 'Usuario'), messagesForDetermination);
+          const cleanedResponse = response.trim();
+
+          // Dividimos en oraciones (opcional)
+          const chunks = cleanedResponse.split(/(?<!\d)\.\s+/g);
+          for (const chunk of chunks) {
+            if (chunk.trim()) {
+              await flowDynamic([{ body: chunk.trim() + '.' }]);
+            }
+          }
+
+          // Guardamos en la base de datos
+          const newEntry = {
+            pregunta: body,
+            respuesta: cleanedResponse,
+            fecha: new Date(),
+          };
+          await mongoAdapter.agregarHistorial(ctx.from, newEntry);
+        }
+      });
+    } catch (error) {
+      console.error('Error en el flujo principal:', error);
+      // Manejo de errores adicional...
+    }
+  });
