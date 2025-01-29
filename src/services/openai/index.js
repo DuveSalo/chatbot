@@ -70,7 +70,6 @@ const chatHistory = async (prompt, messages) => {
       return completion.choices[0].message.content;
   } catch (err) {
       console.error("Error al conectar con OpenAI:", err);
-      return "ERROR";
   }
 };
 export { run, runDetermine, chatHistory }
