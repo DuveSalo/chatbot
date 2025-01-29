@@ -17,8 +17,8 @@ const run = async (history) => {
             },
             ...history
         ],
-        temperature: 1,
-        max_tokens: 800,
+        temperature: 0.5,
+        max_tokens: 300,
         top_p: 1,
         frequency_penalty: 0,
         presence_penalty: 0,
@@ -38,8 +38,8 @@ const runDetermine = async (history) => {
             },
             ...history
         ],
-        temperature: 1,
-        max_tokens: 800,
+        temperature: 0.5,
+        max_tokens: 100,
         top_p: 1,
         frequency_penalty: 0,
         presence_penalty: 0,
@@ -70,9 +70,7 @@ const chatHistory = async (prompt, messages) => {
       return completion.choices[0].message.content;
   } catch (err) {
       console.error("Error al conectar con OpenAI:", err);
-      return "ERROR";
   }
 };
 export { run, runDetermine, chatHistory }
-
 
