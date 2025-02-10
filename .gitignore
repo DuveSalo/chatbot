@@ -1,12 +1,12 @@
-   dist/*
-   node_modules
-   .env
+dist/*
+node_modules
+.env
 
-   base-js-baileys-mongo/src/services/sheets/google.json
+# base-js-baileys-mongo/src/services/sheets/google.json
 
-   *_sessions
-   *tokens
-   .wwebjs*
+*_sessions
+*tokens
+.wwebjs*
 
-   *.log
-   *qr.png
+*.log
+*qr.png
