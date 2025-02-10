@@ -17,5 +17,8 @@ export const config = {
   mongoDb_uri: process.env.mongoDb_uri,
   mongoDb_name: process.env.mongoDb_name,
   // Sheets
-  sheets_api: process.env.SPREADSHEETID
+  sheets_api: process.env.SPREADSHEETID,
+  // Mail
+  mail: process.env.mail,
+  pass: process.env.password, 
 };

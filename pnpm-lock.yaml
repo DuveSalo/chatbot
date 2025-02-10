@@ -41,6 +41,9 @@ importers:
       moongose:
         specifier: ^1.0.0
         version: 1.0.0(@aws-sdk/client-sso-oidc@3.687.0(@aws-sdk/client-sts@3.687.0))(@firebase/app-types@0.8.1)
+      nodemailer:
+        specifier: ^6.10.0
+        version: 6.10.0
       openai:
         specifier: ^4.71.1
         version: 4.71.1(zod@3.23.8)
@@ -3256,6 +3259,10 @@ packages:
   node-wav@0.0.2:
     resolution: {integrity: sha512-M6Rm/bbG6De/gKGxOpeOobx/dnGuP0dz40adqx38boqHhlWssBJZgLCPBNtb9NkrmnKYiV04xELq+R6PFOnoLA==}
     engines: {node: '>=4.4.0'}
+
+  nodemailer@6.10.0:
+    resolution: {integrity: sha512-SQ3wZCExjeSatLE/HBaXS5vqUOQk6GtBdIIKxiFdmm01mOQZX/POJkO3SUX1wDiYcwUOJwT23scFSC9fY2H8IA==}
+    engines: {node: '>=6.0.0'}
 
   nodemon@2.0.22:
     resolution: {integrity: sha512-B8YqaKMmyuCO7BowF1Z1/mkPqLk6cs/l63Ojtd6otKjMx47Dq1utxfRxcavH1I7VSaL8n5BUaoutadnsX3AAVQ==}
@@ -7890,6 +7897,8 @@ snapshots:
   node-forge@1.3.1: {}
 
   node-wav@0.0.2: {}
+
+  nodemailer@6.10.0: {}
 
   nodemon@2.0.22:
     dependencies:
