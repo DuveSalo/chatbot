@@ -1,20 +1,12 @@
-# Ignorar el directorio de distribución
-dist/*
+   dist/*
+   node_modules
+   .env
 
-# Ignorar node_modules
-node_modules
+   base-js-baileys-mongo/src/services/sheets/google.json
 
-# Ignorar archivos de entorno
-.env
+   *_sessions
+   *tokens
+   .wwebjs*
 
-# Ignorar el archivo google.json
-base-js-baileys-mongo/src/services/sheets/google.json
-
-# Ignorar sesiones y tokens
-*_sessions
-*tokens
-.wwebjs*
-
-# Ignorar archivos de log y QR
-*.log
-*qr.png
+   *.log
+   *qr.png
