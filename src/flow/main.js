@@ -100,20 +100,23 @@ export const mainFlow = addKeyword(EVENTS.WELCOME)
           'ASISTENCIA': asistencia,
         };
 
-        if (flowMap[service]) {
-          return gotoFlow(flowMap[service]);
+        if (service === 'SALUDO') {
+            // Respuesta de bienvenida para un saludo
+            await flowDynamic([{ body: `¡Hola ${ctx.pushName}! Bienvenido a Consultora Integral Excon. ¿En qué puedo ayudarte hoy?` }]);
+            return;
+        } else if (flowMap[service]) {
+            return gotoFlow(flowMap[service]);
         } else if (service === 'CONSULTA') {
-          // Llamada a chatHistory
-          const response = await chatHistory(generatePrompt(ctx.pushName || 'Usuario'), messagesForDetermination);
-          const cleanedResponse = response.trim();
-
-          // Dividimos en oraciones (opcional)
-          const chunks = cleanedResponse.split(/(?<!\d)\.\s+/g);
-          for (const chunk of chunks) {
-            if (chunk.trim()) {
-              await flowDynamic([{ body: chunk.trim() + '.' }]);
+            // Procesa la consulta general usando la BASE_DE_DATOS
+            const response = await chatHistory(generatePrompt(ctx.pushName || 'Usuario'), messagesForDetermination);
+            const cleanedResponse = response.trim();
+            const chunks = cleanedResponse.split(/(?<!\d)\.\s+/g);
+            
+            for (const chunk of chunks) {
+                if (chunk.trim()) {
+                    await flowDynamic([{ body: chunk.trim() + '.' }]);
+                }
             }
-          }
 
           // Guardamos en la base de datos
           const newEntry = {
