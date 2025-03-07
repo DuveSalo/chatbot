@@ -1,4 +1,3 @@
-// src/db/index.js
 import mongoose from 'mongoose';
 import { config } from '../config/index.js';
 
@@ -38,7 +37,7 @@ export class MongoAdapter {
 
   constructor(dbURI) {
     this.dbURI = dbURI;
-    MongoAdapter.getConnection(dbURI); // Inicia la conexión singleton
+    MongoAdapter.getConnection(dbURI);
   }
 
   async agregarOActualizarCliente(clienteData) {
@@ -46,7 +45,7 @@ export class MongoAdapter {
     const session = await mongoose.startSession();
     try {
       session.startTransaction();
-      // Se busca el cliente existente dentro de la sesión
+
       const clienteExistente = await Cliente.findOne({ numero: clienteData.numero }).session(session);
       if (clienteExistente) {
         clienteExistente.historial = clienteData.historial;
@@ -55,7 +54,7 @@ export class MongoAdapter {
         await session.commitTransaction();
         return clienteExistente;
       }
-      // Si no existe, se crea uno nuevo
+
       const nuevoCliente = new Cliente(clienteData);
       nuevoCliente.ultimaInteraccion = new Date();
       await nuevoCliente.save({ session });
@@ -72,13 +71,13 @@ export class MongoAdapter {
 
   async buscarClientePorNumero(numero) {
     await MongoAdapter.getConnection(this.dbURI);
-    // Se elimina .lean() para asegurar que se retorne la instancia del documento
+
     return Cliente.findOne({ numero }).exec();
   }
 
   async agregarHistorial(numeroCliente, historialData) {
     await MongoAdapter.getConnection(this.dbURI);
-    // Se obtiene el documento completo para poder actualizarlo
+
     const cliente = await Cliente.findOne({ numero: numeroCliente }).exec();
     if (!cliente) {
       console.error(`Cliente con número ${numeroCliente} no encontrado`);
