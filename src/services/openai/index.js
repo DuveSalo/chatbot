@@ -33,7 +33,7 @@ const chat = async (question, thread = null) => {
 
           // Devuelve el thread y la última respuesta del asistente (si existe)
           const answer = assistantResponse ? assistantResponse.content[0].text.value : null
-          const cleanAnswer = answer.replace(/【\d+:\d+†source】/g, '');
+          const cleanAnswer = answer.replace(/【\d+:\d+†[\s\S]*?】/g, '');
           return {
               thread,
               response: cleanAnswer
