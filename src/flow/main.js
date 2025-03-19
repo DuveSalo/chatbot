@@ -79,7 +79,7 @@ export const mainFlow = addKeyword(EVENTS.WELCOME)
                         const currentState = await ctxFn.state.getMyState();
                         const thread = currentState?.thread ?? null;
                         
-                        const response = await chat(body, ctx.name, thread);
+                        const response = await chat(body, ctx.name, null);
                         await ctxFn.state.update({ thread: response.thread });
 
                         const chunks = response.response.split(/\n\n+/);
