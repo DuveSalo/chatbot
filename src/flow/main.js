@@ -79,7 +79,7 @@ export const mainFlow = addKeyword(EVENTS.WELCOME)
                         const currentState = await ctxFn.state.getMyState();
                         const thread = currentState?.thread ?? null;
                         
-                        const response = await chat(ctx.body, thread);
+                        const response = await chat(ctx.body, ctx.name, thread);
                         await ctxFn.state.update({ thread: response.thread });
 
                         const newEntry = {
