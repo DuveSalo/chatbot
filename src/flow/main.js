@@ -79,9 +79,6 @@ export const mainFlow = addKeyword(EVENTS.WELCOME)
                         const currentState = await ctxFn.state.getMyState();
                         const thread = currentState?.thread ?? null;
                         
-                        // Mensaje intermedio para indicar al usuario que espere
-                        await ctxFn.flowDynamic ("Por favor, espera un momento, estamos consultando la información...");
-                        
                         const response = await chat(ctx.body, thread);
                         await ctxFn.state.update({ thread: response.thread });
 
