@@ -3,7 +3,7 @@ import { addKeyword, EVENTS } from '@builderbot/bot';
 import { isSameDay } from 'date-fns';
 
 // Importa la cola de mensajes (fast-entires.js)
-import { createMessageQueue } from './fast-entires.js';
+import { createMessageQueue } from '../utils/fast-entires.js';
 
 // Importa las funciones de OpenAI para clasificación y respuesta
 import { runDetermine, chat } from './services/openai/index.js';
