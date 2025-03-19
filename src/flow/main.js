@@ -6,18 +6,18 @@ import { isSameDay } from 'date-fns';
 import { createMessageQueue } from '../utils/fast-entires.js';
 
 // Importa las funciones de OpenAI para clasificación y respuesta
-import { runDetermine, chat } from './services/openai/index.js';
+import { runDetermine, chat } from '../services/openai/index.js';
 
 // Flujos secundarios (ajusta las rutas según tu proyecto)
-import { flowPreguntasIniciales } from './flows/presupuesto/sistema/inicio.js';
-import asistencia from './flows/presupuesto/asistencia.js';
-import extintores from './flows/presupuesto/extintores.js';
-import ergonomicos from './flows/presupuesto/ergonomicos.js';
-import mediciones from './flows/presupuesto/mediciones.js';
-import servicio from './flows/presupuesto/servicio.js';
+import { flowPreguntasIniciales } from './presupuesto/sistema/inicio.js';
+import asistencia from './presupuesto/asistencia.js';
+import extintores from './presupuesto/extintores.js';
+import ergonomicos from './presupuesto/ergonomicos.js';
+import mediciones from './presupuesto/mediciones.js';
+import servicio from './presupuesto/servicio.js';
 
 // Importa la lógica de la base de datos
-import { mongoAdapter } from './db/index.js';
+import { mongoAdapter } from '../db/index.js';
 
 // Configuración de la cola: ajusta gapMilliseconds según el tiempo que desees esperar para concatenar mensajes
 const queueConfig = { gapMilliseconds: 15000 }; // Ejemplo: 15 segundos
