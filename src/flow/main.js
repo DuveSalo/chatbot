@@ -94,7 +94,6 @@ export const mainFlow = addKeyword(EVENTS.WELCOME)
                             fecha: new Date(),
                         };
                         await mongoAdapter.agregarHistorial(ctx.from, newEntry);
-                        return ctxFn.endFlow(response.response);
                     }
                 } catch (error) {
                     console.error("Error en la lógica del mensaje:", error);
