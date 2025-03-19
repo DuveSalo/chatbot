@@ -6,7 +6,7 @@ const openai = new OpenAI({ apiKey: config.openai_apikey });
 const assistant = config.assistant;
 const grupo = config.grupo;
 
-const chat = async (question, thread = null) => {
+const chat = async (question, name, thread = null) => {
   try {
       thread = thread || await openai.beta.threads.create();
 
@@ -19,6 +19,7 @@ const chat = async (question, thread = null) => {
       // Crear y ejecutar la corrida del asistente
       const run = await openai.beta.threads.runs.createAndPoll(thread.id, {
           assistant_id: assistant,
+          instructions: "El nombre de este usuario es: " + name
       });
 
       // Si la corrida se completa, obtén la lista de mensajes y la última respuesta del asistente
