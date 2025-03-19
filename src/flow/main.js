@@ -78,6 +78,8 @@ export const mainFlow = addKeyword(EVENTS.WELCOME)
                     } else if (service === 'CONSULTA') {
                         const currentState = await ctxFn.state.getMyState();
                         const thread = currentState?.thread ?? null;
+
+                        console.log("Texto que se le pasa a chat:", body);
                         
                         const response = await chat(body, ctx.name, null);
                         await ctxFn.state.update({ thread: response.thread });
