@@ -82,6 +82,12 @@ export const mainFlow = addKeyword(EVENTS.WELCOME)
                         const response = await chat(ctx.body, ctx.name, thread);
                         await ctxFn.state.update({ thread: response.thread });
 
+                        const chunks = response.split(/\n\n+/);
+                        for (const chunk of chunks) {
+                            const cleanedChunk = chunk.trim().replace(/【.*?】[ ] /g, "");
+                            await flowDynamic([{ body: cleanedChunk }]);
+                            }
+
                         const newEntry = {
                             pregunta: body,
                             respuesta: response.response,
