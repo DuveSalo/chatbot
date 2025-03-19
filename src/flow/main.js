@@ -85,7 +85,7 @@ export const mainFlow = addKeyword(EVENTS.WELCOME)
                         const chunks = response.response.split(/\n\n+/);
                         for (const chunk of chunks) {
                             const cleanedChunk = chunk.trim().replace(/【.*?】[ ] /g, "");
-                            await flowDynamic([{ body: cleanedChunk }]);
+                            await ctxFn.flowDynamic([{ body: cleanedChunk }]);
                             }
 
                         const newEntry = {
