@@ -46,13 +46,6 @@ export const mainFlow = addKeyword(EVENTS.WELCOME)
                 try {
                     let dbClient = await ctxFn.state.get('dbClient');
 
-                    const isFirstMessage = !dbClient.historial.length || !isSameDay(dbClient.ultimaInteraccion, new Date());
-
-                    if (isFirstMessage) {
-                        const saludo = ctx.from.sexo === 'F' ? 'Bienvenida' : 'Bienvenido';
-                        await ctxFn.flowDynamic([{ body: `¡Hola, ${ctx.pushName}! ${saludo} al asistente virtual de la Consultora Integral Excon ` }]);
-                    }
-
                     const combinedMessage = { role: "user", content: body };
                     const limitedHistory = dbClient.historial?.slice(-2).reduce((acc, item) => {
                         acc.push({ role: "user", content: item.pregunta });
