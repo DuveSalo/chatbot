@@ -32,6 +32,15 @@ const handleDbError = async (ctx, state) => {
 
 export const mainFlow = addKeyword(EVENTS.WELCOME)
     .addAction(async (ctx, ctxFn) => {
+    const numero = ctx.from;
+    // --- Verificar bloqueo ---
+    if (await mongoAdapter.isUserBlocked(numero)) {
+      await ctxFn.endFlow(
+        "Pronto se pondrán en contacto contigo para brindarte más información acerca de tu solicitud de presupuesto."
+      );
+      return;
+    }})
+    .addAction(async (ctx, ctxFn) => {
         let dbClient = await mongoAdapter.buscarClientePorNumero(ctx.from);
 
         if (!dbClient) {
@@ -45,6 +54,13 @@ export const mainFlow = addKeyword(EVENTS.WELCOME)
             enqueueMessage(ctx, async (body) => {
                 try {
                     let dbClient = await ctxFn.state.get('dbClient');
+
+                    const isFirstMessage = !dbClient.historial.length || !isSameDay(dbClient.ultimaInteraccion, new Date());
+
+                    if (isFirstMessage) {
+                        const saludo = ctx.from.sexo === 'F' ? 'Bienvenida' : 'Bienvenido';
+                        await ctxFn.flowDynamic([{ body: `¡Hola, ${ctx.pushName}! ${saludo} al asistente virtual de la Consultora Integral Excon ` }]);
+                    }
 
                     const combinedMessage = { role: "user", content: body };
                     const limitedHistory = dbClient.historial?.slice(-2).reduce((acc, item) => {
@@ -71,8 +87,10 @@ export const mainFlow = addKeyword(EVENTS.WELCOME)
                     } else if (service === 'CONSULTA') {
                         const currentState = await ctxFn.state.getMyState();
                         const thread = currentState?.thread ?? null;
+                        
+                        await ctxFn.flowDynamic([{ body: "Por favor espera, estamos consultando la información..." }]);
                                                                         
-                        const response = await chat(body, ctx.name, null);
+                        const response = await chat(ctx.body, thread);
                         await ctxFn.state.update({ thread: response.thread });
 
                         const newEntry = {
