@@ -47,6 +47,12 @@ export const flowGuardarDatos = addKeyword(EVENTS.ACTION)
     subject: 'Solicitud de Presupuesto para Sistema de Autoprotección',
     text: mailContent
   });
+    
+  // --- Bloquear al usuario tras completar el formulario ---
+      await mongoAdapter.blockUser(ctx.from);
+
+      // Finalizar flujo para usuario bloqueado
+      return ctxFn.endFlow();
 
   
   }
