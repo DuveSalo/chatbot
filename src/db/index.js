@@ -12,6 +12,7 @@ const ClienteSchema = new mongoose.Schema({
   numero: { type: String, required: true, unique: true, index: true },
   historial: { type: [HistorySchema], default: [] },
   ultimaInteraccion: { type: Date },
+  isBlocked: { type: Boolean, default: false, index: true },
 });
 
 export const Cliente = mongoose.model('TestBot', ClienteSchema);
@@ -22,7 +23,7 @@ export class MongoAdapter {
   static async getConnection(dbURI) {
     if (!connectionPromise) {
       connectionPromise = mongoose
-        .connect(dbURI, { maxPoolSize: 10 })
+        .connect(dbURI, { dbName: config.mongoDb_name, maxPoolSize: 10 })
         .then(() => {
           console.log('Conectado a MongoDB');
           return mongoose.connection;
@@ -71,13 +72,11 @@ export class MongoAdapter {
 
   async buscarClientePorNumero(numero) {
     await MongoAdapter.getConnection(this.dbURI);
-
     return Cliente.findOne({ numero }).exec();
   }
 
   async agregarHistorial(numeroCliente, historialData) {
     await MongoAdapter.getConnection(this.dbURI);
-
     const cliente = await Cliente.findOne({ numero: numeroCliente }).exec();
     if (!cliente) {
       console.error(`Cliente con número ${numeroCliente} no encontrado`);
@@ -86,6 +85,62 @@ export class MongoAdapter {
     cliente.historial.push(historialData);
     cliente.ultimaInteraccion = new Date();
     return cliente.save();
+  }
+
+  async blockUser(numero) {
+    await MongoAdapter.getConnection(this.dbURI);
+    try {
+      const updatedUser = await Cliente.findOneAndUpdate(
+        { numero: numero },
+        { $set: { isBlocked: true } },
+        { new: false } // Devuelve el documento original por defecto, no necesitamos el nuevo aquí
+      ).exec();
+      if (!updatedUser) {
+         console.warn(`Attempted to block non-existent user: ${numero}`);
+         // Podría lanzar un error si se prefiere manejarlo explícitamente
+      }
+      return updatedUser; // O simplemente retornar void o un booleano indicando éxito/fallo
+    } catch (error) {
+      console.error(`Error blocking user ${numero}:`, error);
+      throw error; // Re-lanzar para manejo superior si es necesario
+    }
+  }
+
+  async unblockUser(numero) {
+    await MongoAdapter.getConnection(this.dbURI);
+    try {
+      const updatedUser = await Cliente.findOneAndUpdate(
+        { numero: numero },
+        { $set: { isBlocked: false } },
+        { new: false }
+      ).exec();
+       if (!updatedUser) {
+         console.warn(`Attempted to unblock non-existent user: ${numero}`);
+         // Podría lanzar un error
+      }
+      return updatedUser; // O retornar indicación de éxito/fallo
+    } catch (error) {
+      console.error(`Error unblocking user ${numero}:`, error);
+      throw error;
+    }
+  }
+
+  async isUserBlocked(numero) {
+    await MongoAdapter.getConnection(this.dbURI);
+    try {
+      const cliente = await Cliente.findOne(
+          { numero: numero },
+          { isBlocked: 1, _id: 0 } // Proyección para obtener solo isBlocked
+      ).lean().exec(); // lean() para obtener un objeto JS plano
+
+      // Si el cliente no existe, no está bloqueado.
+      // Si existe y isBlocked es true, está bloqueado.
+      // Si existe y isBlocked es false o undefined (por defecto), no está bloqueado.
+      return cliente? cliente.isBlocked === true : false;
+    } catch (error) {
+      console.error(`Error checking block status for user ${numero}:`, error);
+      throw error; // Re-lanzar para que el flujo que llama decida cómo proceder
+    }
   }
 }
 
