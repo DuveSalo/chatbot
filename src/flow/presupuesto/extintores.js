@@ -87,7 +87,12 @@ export default addKeyword(EVENTS.ACTION)
       subject: 'Solicitud de Presupuesto para Entrenamiento en el uso de Extintores',
       text: mailContent
     });
-    
+
+    // --- Bloquear al usuario tras completar el formulario ---
+      await mongoAdapter.blockUser(ctx.from);
+
+      // Finalizar flujo para usuario bloqueado
+      return ctxFn.endFlow();
 
     }
   );
