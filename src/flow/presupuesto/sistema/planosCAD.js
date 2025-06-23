@@ -3,8 +3,6 @@ import { flowPlanosPapel } from './planosPapel.js';
 import { flowPreguntasFinales } from './final.js';
 
 export const flowPlanosCAD = addKeyword(EVENTS.ACTION)
-.addAction(async () => {
-})
   .addAnswer('¿Tienen los planos actualizados en CAD?', { capture: true }, async (ctx, { state, gotoFlow, flowDynamic }) => {
     await state.update({ menuActual: 'presupuestos' });
     await state.update({ planosCAD: ctx.body });
