@@ -1,5 +1,3 @@
---- START OF FILE flow/presupuesto/sistema/guardar.js ---
-
 import { addKeyword, EVENTS } from "@builderbot/bot";
 import { appendToSheet } from "../../../services/sheets/index.js";
 import { sendMail } from "../../../services/mail/index.js";
