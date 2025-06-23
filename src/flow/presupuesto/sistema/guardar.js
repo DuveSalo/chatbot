@@ -1,3 +1,5 @@
+--- START OF FILE flow/presupuesto/sistema/guardar.js ---
+
 import { addKeyword, EVENTS } from "@builderbot/bot";
 import { appendToSheet } from "../../../services/sheets/index.js";
 import { sendMail } from "../../../services/mail/index.js";
@@ -11,21 +13,37 @@ export const flowGuardarDatos = addKeyword(EVENTS.ACTION)
   await state.update({ menuActual: 'presupuestos' });
 })  
 .addAnswer(
-  'Tu solicitud ha sido procesada con éxito. Pronto se pondrán en contacto contigo para brindarte más información. ¡Gracias!', null, 
+  'Tu solicitud ha sido procesada con éxito. Pronto se pondrán en contacto contigo para brindarte más información. ¡Gracias!', 
+  null, 
   async (ctx, ctxFn) => {
-    const actividad = ctxFn.state.get("actividad");
-    const superficie = ctxFn.state.get("superficie");
-    const subsuelos = ctxFn.state.get("subsuelos");
-    const pisos = ctxFn.state.get("pisos");
-    const grupo = ctxFn.state.get("grupo");
-    const planosCAD = ctxFn.state.get("planosCAD");
-    const planosPapel = ctxFn.state.get("planosPapel");
-    const empresa = ctxFn.state.get("empresa");
-    const empleados = ctxFn.state.get("empleados");
-    const nombre = ctxFn.state.get("nombre");
-    const email = ctxFn.state.get("email");
-    const telefono = ctxFn.state.get("telefono");
-    await appendToSheet(SHEET_NAME, [actividad, superficie, subsuelos, pisos, grupo, planosCAD, planosPapel, empleados, empresa, nombre, email, telefono]);
+    const actividad = await ctxFn.state.get("actividad");
+    const superficie = await ctxFn.state.get("superficie");
+    const subsuelos = await ctxFn.state.get("subsuelos");
+    const pisos = await ctxFn.state.get("pisos");
+    const grupo = await ctxFn.state.get("grupo");
+    const planosCAD = await ctxFn.state.get("planosCAD");
+    // <<< MEJORA: Si 'planosPapel' no se estableció, se asigna un valor por defecto.
+    const planosPapel = (await ctxFn.state.get("planosPapel")) || 'No aplica'; 
+    const empresa = await ctxFn.state.get("empresa");
+    const empleados = await ctxFn.state.get("empleados");
+    const nombre = await ctxFn.state.get("nombre");
+    const email = await ctxFn.state.get("email");
+    const telefono = await ctxFn.state.get("telefono");
+
+    await appendToSheet(SHEET_NAME, [
+        actividad, 
+        superficie, 
+        subsuelos, 
+        pisos, 
+        grupo, 
+        planosCAD, 
+        planosPapel, 
+        empleados, 
+        empresa, 
+        nombre, 
+        email, 
+        telefono
+    ]);
   
   const mailContent = `
   Se ha recibido una solicitud de presupuesto para un Sistema de Autoprotección con los siguientes detalles:
@@ -54,8 +72,6 @@ export const flowGuardarDatos = addKeyword(EVENTS.ACTION)
 
       // Finalizar flujo para usuario bloqueado
       return ctxFn.endFlow();
-
-  
   }
 );
 
