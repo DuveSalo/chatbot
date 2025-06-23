@@ -1,7 +1,9 @@
+--- START OF FILE flow/presupuesto/asistencia.js ---
+
 import { addKeyword, EVENTS } from "@builderbot/bot";
 import { appendToSheet } from "../../services/sheets/index.js";
 import { sendMail } from "../../services/mail/index.js";
-import { mongoAdapter } from "../../db/index.js";  // Importar para bloqueo
+import { mongoAdapter } from "../../db/index.js";  // <<< CORRECCIÓN: Se importó el mongoAdapter.
 
 const SHEET_NAME = 'Asistencia Profesional';
 const DEST_EMAIL = 'consultoraexcon@gmail.com';
