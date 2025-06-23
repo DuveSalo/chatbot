@@ -6,7 +6,7 @@ const openai = new OpenAI({ apiKey: config.openai_apikey });
 const assistant = config.assistant;
 const grupo = config.grupo;
 
-const chat = async (question, name, thread = null) => {
+const chat = async (question, thread = null) => {
   try {
       thread = thread || await openai.beta.threads.create();
 
@@ -33,7 +33,7 @@ const chat = async (question, name, thread = null) => {
 
           // Devuelve el thread y la última respuesta del asistente (si existe)
           const answer = assistantResponse ? assistantResponse.content[0].text.value : null
-          const cleanAnswer = answer.replace(/【\d+:\d+†[\s\S]*?】/g, '');
+          const cleanAnswer = answer.replace(/【\d+:\d+†.*?】/g, '');
           return {
               thread,
               response: cleanAnswer
@@ -95,8 +95,10 @@ const DetermineGrupo = async (actividad, superficie, subsuelos, pisos) => {
       content: datos,
     });
   
-    // 3. Realizar polling con nuestra función optimizada
-    const run = await openai.beta.threads.runs.createAndPoll(thread.id, grupo);
+    // <<< CORRECCIÓN: La llamada a createAndPoll debe recibir un objeto con el assistant_id.
+    const run = await openai.beta.threads.runs.createAndPoll(thread.id, {
+        assistant_id: grupo
+    });
   
     if (run.status === "completed") {
       const messages = await openai.beta.threads.messages.list(run.thread_id);
