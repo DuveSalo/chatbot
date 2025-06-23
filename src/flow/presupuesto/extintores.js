@@ -1,6 +1,7 @@
 import { addKeyword, EVENTS } from "@builderbot/bot";
 import { appendToSheet } from "../../services/sheets/index.js";
 import { sendMail } from "../../services/mail/index.js"; 
+import { mongoAdapter } from "../../db/index.js";
 
 const SHEET_NAME = 'Entrenamiento en el uso de extintores';
 const DEST_EMAIL = 'consultoraexcon@gmail.com';
