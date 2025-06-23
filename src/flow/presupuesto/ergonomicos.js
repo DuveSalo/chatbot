@@ -3,7 +3,7 @@ import { appendToSheet } from "../../services/sheets/index.js";
 import { sendMail } from "../../services/mail/index.js"; 
 import { mongoAdapter } from "../../db/index.js";
 
-const SHEET_NAME = 'Entrenamiento en el uso de extintores';
+const SHEET_NAME = 'Estudios Ergonómicos';
 const DEST_EMAIL = 'consultoraexcon@gmail.com';
 
 export default addKeyword(EVENTS.ACTION)
@@ -11,26 +11,11 @@ export default addKeyword(EVENTS.ACTION)
     await state.update({ menuActual: 'presupuestos'});
   })
   .addAnswer(
-    'Para proporcionarte un presupuesto de entrenamiento en el uso de extintores, necesito la siguiente información:'
+    'Para proporcionarte un presupuesto de estudios ergonómicos, necesito la siguiente información:'
   )
-  .addAnswer('¿Cuál es la ubicación del entrenamiento?', { capture: true },
+  .addAnswer('¿Cuántos puestos necesitas evaluar?', { capture: true },
     async (ctx, ctxFn) => {
-        await ctxFn.state.update({ "ubicacion": ctx.body });
-      }
-  )
-  .addAnswer('¿Cuántos empleados participarán en el entrenamiento?', { capture: true },
-    async (ctx, ctxFn) => {
-        await ctxFn.state.update({ "empleados": ctx.body });
-      }
-  )
-  .addAnswer('¿El entrenamiento será teórico y práctico o solo teórico?', { capture: true },
-    async (ctx, ctxFn) => {
-        await ctxFn.state.update({ "tipo": ctx.body });
-      }
-  )
-  .addAnswer('¿El entrenamiento será durante el día o la noche?', { capture: true },
-    async (ctx, ctxFn) => {
-        await ctxFn.state.update({ "horario": ctx.body });
+        await ctxFn.state.update({ "puestos": ctx.body });
       }
   )
   .addAnswer('Ahora necesito la siguiente información de contacto.')
@@ -60,35 +45,30 @@ export default addKeyword(EVENTS.ACTION)
   .addAnswer(
     'Tu solicitud ha sido procesada con éxito. Pronto se pondrán en contacto contigo para brindarte más información. ¡Gracias!', null, 
     async (ctx, ctxFn) => {
-      const ubicacion = ctxFn.state.get("ubicacion");
-      const empleados = ctxFn.state.get("empleados");
-      const tipo = ctxFn.state.get("tipo");
-      const horario = ctxFn.state.get("horario");
+      const puestos = ctxFn.state.get("puestos");
       const empresa = ctxFn.state.get("empresa");
       const nombre = ctxFn.state.get("nombre");
       const email = ctxFn.state.get("email");
       const telefono = ctxFn.state.get("telefono");
-      await appendToSheet(SHEET_NAME, [ubicacion, empleados, tipo, horario, empresa, nombre, email, telefono]);
-    
-    const mailContent = `
-    Se ha recibido una solicitud de presupuesto para un Entrenamiento en el uso de Extintores con los siguientes detalles:
-    - Nombre: ${nombre}
-    - Email: ${email}
-    - Teléfono: ${telefono}
-    - Ubicación del entrenamiento: ${ubicacion}
-    - Cantidad de empleados: ${empleados}
-    - Tipo de entrenamiento: ${tipo}
-    - Horario: ${horario}
-    - Empresa: ${empresa}
-          `;
+      await appendToSheet(SHEET_NAME, [puestos, empresa, nombre, email, telefono]);
 
-    await sendMail({
-      to: DEST_EMAIL,
-      subject: 'Solicitud de Presupuesto para Entrenamiento en el uso de Extintores',
-      text: mailContent
-    });
 
-    // --- Bloquear al usuario tras completar el formulario ---
+      const mailContent = `
+      Se ha recibido una solicitud de presupuesto para un Estudio Ergonómico con los siguientes detalles:
+      - Nombre: ${nombre}
+      - Email: ${email}
+      - Teléfono: ${telefono}
+      - Cantidad de puestos a evaluar: ${puestos}
+      - Empresa: ${empresa}
+            `;
+
+      await sendMail({
+        to: DEST_EMAIL,
+        subject: 'Solicitud de Presupuesto para Estudio Ergonómico',
+        text: mailContent
+      });
+      
+      // --- Bloquear al usuario tras completar el formulario ---
       await mongoAdapter.blockUser(ctx.from);
 
       // Finalizar flujo para usuario bloqueado
