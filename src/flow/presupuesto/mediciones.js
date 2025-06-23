@@ -1,6 +1,7 @@
 import { addKeyword, EVENTS } from "@builderbot/bot";
 import { appendToSheet } from "../../services/sheets/index.js";
 import { sendMail } from "../../services/mail/index.js"; 
+import { mongoAdapter } from "../../db/index.js";
 
 const SHEET_NAME = 'Mediciones del ambiente laboral';
 const DEST_EMAIL = 'consultoraexcon@gmail.com';
@@ -56,7 +57,8 @@ export default addKeyword(EVENTS.ACTION)
     'Tu solicitud ha sido procesada con éxito. Pronto se pondrán en contacto contigo para brindarte más información. ¡Gracias!', null, 
     async (ctx, ctxFn) => {
       const tipo = ctxFn.state.get("tipo");
-      const puntual_ambiental = ctxFn.state.get("puntal_ambiental");
+      // <<< CORRECCIÓN: Se corrigió el typo de "puntal" a "puntual".
+      const puntual_ambiental = ctxFn.state.get("puntual_ambiental"); 
       const puestos = ctxFn.state.get("puestos");
       const empresa = ctxFn.state.get("empresa");
       const nombre = ctxFn.state.get("nombre");
