@@ -1,21 +1,13 @@
-import { createBot } from '@builderbot/bot'
+import { createBot, createProvider } from '@builderbot/bot'
 import { MongoAdapter as Database } from '@builderbot/database-mongo'
-import { providerMeta, providerBaileys } from './provider/index.js';
+import { BaileysProvider as Provider } from '@builderbot/provider-baileys';
 import { config } from './config/index.js';
 import flows from './flow/index.js';
 
 const PORT = config.PORT;
 
 const main = async () => {
-    let adapterProvider;
-    if (config.provider === "meta") {
-        adapterProvider = providerMeta;
-    } else if (config.provider === "baileys") {
-        adapterProvider = providerBaileys;
-    } else {
-        console.log("ERROR: Falta agregar un provider al .env")
-    }
-
+    const adapterProvider = createProvider(Provider);
 
     const adapterDB = new Database({
         dbUri: config.mongoDb_uri,
