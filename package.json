@@ -24,9 +24,9 @@
     "openai-assistants": "^1.0.15"
   },
   "devDependencies": {
-    "eslint": "^8.57.0",
+    "eslint": "^8.57.1",
     "eslint-plugin-builderbot": "latest",
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.10"
   },
   "author": "",
   "license": "ISC"
