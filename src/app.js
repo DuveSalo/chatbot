@@ -7,8 +7,7 @@ import flows from './flow/index.js';
 const PORT = config.PORT;
 
 const main = async () => {
-    const adapterProvider = createProvider(Provider);
-
+    const adapterProvider = createProvider(Provider, {version: [2, 3000, 1023223821]});
     const adapterDB = new Database({
         dbUri: config.mongoDb_uri,
         dbName: config.mongoDb_name,
