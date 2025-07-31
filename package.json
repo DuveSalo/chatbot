@@ -11,11 +11,17 @@
   },
   "keywords": [],
   "dependencies": {
+    "@builderbot-plugins/langchain": "1.0.0-alpha.0",
+    "@builderbot-plugins/openai-assistants": "^0.0.2",
     "@builderbot/bot": "1.2.9",
     "@builderbot/database-mongo": "1.2.9",
     "@builderbot/provider-baileys": "1.2.9",
+    "date-fns": "^4.1.0",
     "dotenv": "^17.2.1",
-    "openai": "^5.11.0"
+    "mongoose": "^8.17.0",
+    "nodemailer": "^7.0.5",
+    "openai": "^5.11.0",
+    "openai-assistants": "^1.0.15"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
