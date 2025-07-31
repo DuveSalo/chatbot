@@ -2,7 +2,7 @@ import 'dotenv/config';
 
 export const config = {
   // Variables de entorno
-  PORT: process.env.PORT || 3008,
+  PORT: process.env.PORT || 8080,
   provider: process.env.provider,
   // OpenAI
   openai_apikey: process.env.openai_apikey,
