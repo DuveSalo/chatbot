@@ -32,14 +32,15 @@ const handleDbError = async (ctx, state) => {
 
 export const mainFlow = addKeyword(EVENTS.WELCOME)
     .addAction(async (ctx, ctxFn) => {
-    const numero = ctx.from;
-    // --- Verificar bloqueo ---
-    if (await mongoAdapter.isUserBlocked(numero)) {
-      await ctxFn.endFlow(
-        "Pronto se pondrán en contacto contigo para brindarte más información acerca de tu solicitud de presupuesto."
-      );
-      return;
-    }})
+        const numero = ctx.from;
+        // --- Verificar bloqueo ---
+        if (await mongoAdapter.isUserBlocked(numero)) {
+            await ctxFn.endFlow(
+                "Pronto se pondrán en contacto contigo para brindarte más información acerca de tu solicitud de presupuesto."
+            );
+            return;
+        }
+    })
     .addAction(async (ctx, ctxFn) => {
         let dbClient = await mongoAdapter.buscarClientePorNumero(ctx.from);
 
@@ -91,11 +92,14 @@ export const mainFlow = addKeyword(EVENTS.WELCOME)
 
                     // Default to 'CONSULTA' behavior if no specific flow is matched
                     const thread = state?.thread ?? null;
-                    
-                    await ctxFn.flowDynamic([{ body: "Por favor espera, estamos consultando la información..." }]);
-                                                                    
                     const response = await chat(ctx.body, thread);
                     await ctxFn.state.update({ thread: response.thread });
+
+                    // Split response into multiple messages if needed
+                    const splitResponses = response.response.split(/\n{2,}/).map(r => r.trim()).filter(Boolean);
+                    for (const msg of splitResponses) {
+                        await ctxFn.flowDynamic([{ body: msg }]);
+                    }
 
                     const newEntry = {
                         pregunta: body,
@@ -103,8 +107,8 @@ export const mainFlow = addKeyword(EVENTS.WELCOME)
                         fecha: new Date(),
                     };
                     await mongoAdapter.agregarHistorial(ctx.from, newEntry);
-                    return ctxFn.endFlow(response.response);
-                        
+                    return ctxFn.endFlow();
+
                 } catch (error) {
                     console.error("Error en la lógica del mensaje:", error);
                     await ctxFn.endFlow("Ocurrió un error inesperado. Inténtalo de nuevo más tarde.");
