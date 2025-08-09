@@ -46,7 +46,8 @@ ${possibleResponses.map(r => `- ${r}`).join('\n')}
 Las reglas para clasificar son las siguientes:
 
 1.  **Consulta General**
-    - Si el user realiza una pregunta general sobre los servicios de la empresa sin mencionar términos relacionados con costos, precios, adquisición o cualquier intención de contratación (ejemplos: "presupuesto", "costo", "precio", "valor", "tarifa", "adquirir", "honorarios", "cotización"), o simplemente saluda, la intención es general.
+    - Si el user realiza una pregunta general sobre los servicios de la empresa sin mencionar términos relacionados con costos, preci10
+     b  os, adquisición o cualquier intención de contratación (ejemplos: "presupuesto", "costo", "precio", "valor", "tarifa", "adquirir", "honorarios", "cotización"), o simplemente saluda, la intención es general.
     - Responde: CONSULTA
 
 2.  **Solicitud de Presupuesto o Adquisición de Servicio**
